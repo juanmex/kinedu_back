@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::API
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
+
   def create_resource(resource)
     if resource.valid?
       resource.save
@@ -14,5 +16,13 @@ class ApplicationController < ActionController::API
     else
       render :json => { :message => "No es posible actualizar el registro", :errors => resource.errors.full_messages }, :status => :bad_request
     end
+  end
+
+  def not_found_response(exception)
+    response = {
+      message: "No se encontró el recurso solicitado",
+      errors: [],
+    }
+    render :json => response, status: :not_found
   end
 end
